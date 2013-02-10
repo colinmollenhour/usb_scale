@@ -165,11 +165,16 @@ namespace ScaleInterface
       // Byte 4 == Weight LSB
       // Byte 5 == Weight MSB
       long startTime = millisecondsSinceEpoch();
-      inData = scale.Read(this.retryTime);
+      // The argument to scale.Read() is a timeout value for the USB
+      // connection, not the actual Scale Status, so I'm leaving it at 250 as
+      // it was originally and waiting 100ms between the 250ms tries. Hope that
+      // makes sense.
+      inData = scale.Read(250);
       while ((ScaleWeightStatus)inData.Data[1] != ScaleWeightStatus.Stable
              && millisecondsSinceEpoch() - startTime < this.timeoutLength)
       {
-        inData = scale.Read(this.retryTime);
+        inData = scale.Read(250);
+	Thread.Sleep(this.retryTime);
       }
       if ((ScaleWeightStatus)inData.Data[1] != ScaleWeightStatus.Stable)
       {
