@@ -174,7 +174,7 @@ namespace ScaleInterface
              && millisecondsSinceEpoch() - startTime < this.timeoutLength)
       {
         inData = scale.Read(250);
-	Thread.Sleep(this.retryTime);
+        Thread.Sleep(this.retryTime);
       }
       if ((ScaleWeightStatus)inData.Data[1] != ScaleWeightStatus.Stable)
       {
