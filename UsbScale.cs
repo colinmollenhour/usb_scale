@@ -24,6 +24,7 @@ namespace ScaleReader
       int scale = 0;
       int retryTime = 100;
       int timeoutLength = 3000;
+      bool debug = false;
       for (int i = 0; i < args.Length; i++)
       {
         string arg = args[i];
@@ -33,8 +34,10 @@ namespace ScaleReader
           // Command-line flags take the form `--arg-name=100`.
           // C#'s Substring() takes a starting index and a /length/.
           string argName = arg.Substring(2, arg.LastIndexOf('=') - 2);
+          int argValue = 0;
           // We're assuming all argument values will be integers.
-          int argValue = Int32.Parse(arg.Substring(arg.LastIndexOf('=') + 1));
+          if (arg.IndexOf('=') != -1)
+            argValue = Int32.Parse(arg.Substring(arg.LastIndexOf('=') + 1));
           switch (argName)
           {
             case "retry":
@@ -42,6 +45,9 @@ namespace ScaleReader
               break;
             case "fail":
               timeoutLength = argValue;
+              break;
+            case "debug":
+              debug = true;
               break;
           }
         }
@@ -64,7 +70,8 @@ namespace ScaleReader
         {
           Error(USBScale.ErrorStringFor(status));
         }
-        s.DebugScaleData();
+        if (debug)
+          s.DebugScaleData();
         s.Disconnect();
         // I'm writing out json manually because including a library to do this seems like overkill.
         Console.Write(@"{{""success"":true,""weight"":{0},""units"":""lbs""}}", weight);
