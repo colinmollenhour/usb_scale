@@ -1,10 +1,6 @@
 /*
- * Created by SharpDevelop.
  * User: nricciar
  * Date: 10/8/2010
- * Time: 3:27 PM
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 namespace ScaleInterface
 {
@@ -81,7 +77,6 @@ namespace ScaleInterface
 
     public USBScale(int scaleNum, int retryTime, int timeoutLength)
     {
-      // TODO: Complete member initialization
       this.scaleNum = scaleNum;
       this.retryTime = retryTime;
       this.timeoutLength = timeoutLength;
@@ -153,10 +148,9 @@ namespace ScaleInterface
     {
       return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
-    public ScaleWeightStatus GetWeight(out decimal? weight, out bool? isStable)
+    public ScaleWeightStatus GetWeight(out decimal? weight)
     {
       weight = null;
-      isStable = false;
 
       // Byte 0 == Report ID?
       // Byte 1 == Scale Status (1 == Fault, 2 == Stable @ 0, 3 == In Motion, 4 == Stable, 5 == Under 0, 6 == Over Weight, 7 == Requires Calibration, 8 == Requires Re-Zeroing)

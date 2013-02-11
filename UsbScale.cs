@@ -1,11 +1,3 @@
-/*
- *  * Created by SharpDevelop.
- *   * User: nricciar
- *    * Date: 10/7/2010
- *     * Time: 11:53 AM
- *      * 
- *       * To change this template use Tools | Options | Coding | Edit Standard Headers.
- *        */
 using System;
 using System.Threading;
 using HidLibrary;
@@ -17,7 +9,7 @@ namespace ScaleReader
   {
     public static void Error(string message)
     {
-      Console.Write(@"{{""success"":false,""error"":""{0}""}}", message);
+      Console.WriteLine(@"{{""success"":false,""error"":""{0}""}}", message);
     }
     public static void Main(string[] args)
     {
@@ -30,14 +22,17 @@ namespace ScaleReader
         string arg = args[i];
         if (arg.StartsWith("--"))
         {
-          // TODO make sure arg matches --[a-z-]+=[0-9]+
-          // Command-line flags take the form `--arg-name=100`.
-          // C#'s Substring() takes a starting index and a /length/.
-          string argName = arg.Substring(2, arg.LastIndexOf('=') - 2);
+          // Command-line flags take the form `--arg-name=100` or `--arg-name`
+          string argName;
           int argValue = 0;
           // We're assuming all argument values will be integers.
           if (arg.IndexOf('=') != -1)
+          {
+            argName = arg.Substring(2, arg.LastIndexOf('=') - 2);
             argValue = Int32.Parse(arg.Substring(arg.LastIndexOf('=') + 1));
+          } else {
+            argName = arg.Substring(2, arg.Length - 2);
+          }
           switch (argName)
           {
             case "retry":
@@ -57,24 +52,25 @@ namespace ScaleReader
           Error(string.Format("Invalid command-line argument. -- {0}", arg));
         }
       }
+      
       decimal? weight;
-      bool? isStable;
 
       USBScale s = new USBScale(scale, retryTime, timeoutLength);
       s.Connect();
 
       if (s.IsConnected)
       {
-        ScaleWeightStatus status = s.GetWeight(out weight, out isStable);
+        ScaleWeightStatus status = s.GetWeight(out weight);
+        s.Disconnect();
         if (status != ScaleWeightStatus.Stable)
         {
           Error(USBScale.ErrorStringFor(status));
+        } else {
+          Console.WriteLine(@"{{""success"":true,""weight"":{0},""units"":""lbs""}}", weight);
         }
-        if (debug)
+        if (debug) {
           s.DebugScaleData();
-        s.Disconnect();
-        // I'm writing out json manually because including a library to do this seems like overkill.
-        Console.Write(@"{{""success"":true,""weight"":{0},""units"":""lbs""}}", weight);
+        }
       } else {
         Error("No Scale Connected.");
       }
