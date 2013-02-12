@@ -8,15 +8,16 @@ This project uses [Mike O’Brien’s USB HID library](http://github.com/mikeobr
 ## Usage
 
 UsbScale.cs can be compiled into a binary that will take the following optional arguments:
---debug        Print debug info
---retry        Milliseconds to wait between retries when reading is not stable.
---fail         Milliseconds before returning an unsuccessful status when the reading is not stable.
-[num]          The number of the scale to read. The first connected scale is 0, then 1, ...
+
+    --debug        Print debug info
+    --retry        Milliseconds to wait between retries when reading is not stable.
+    --fail         Milliseconds before returning an unsuccessful status when the reading is not stable.
+    [num]          The number of the scale to read. The first connected scale is 0, then 1, ...
 
 ## Currently Supported Scales
 
-- Mettler Toledo PS* Scales (Tested with PS60 and PS90)
-- Stamps.com USB Scale
+* Mettler Toledo PS* Scales (Tested with PS60 and PS90)
+* Stamps.com USB Scale
 
 Other scale support should be possible by adding their vendor/product id to the GetDevices() method in the Scale.cs file.
 
