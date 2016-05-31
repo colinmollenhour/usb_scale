@@ -155,7 +155,7 @@ namespace ScaleInterface
       // Byte 0 == Report ID?
       // Byte 1 == Scale Status (1 == Fault, 2 == Stable @ 0, 3 == In Motion, 4 == Stable, 5 == Under 0, 6 == Over Weight, 7 == Requires Calibration, 8 == Requires Re-Zeroing)
       // Byte 2 == Weight Unit
-      // Byte 3 == Data Scaling (decimal placement)
+      // Byte 3 == Data Scaling (decimal placement) - signed byte is power of 10
       // Byte 4 == Weight LSB
       // Byte 5 == Weight MSB
       long startTime = millisecondsSinceEpoch();
@@ -175,11 +175,10 @@ namespace ScaleInterface
         return (ScaleWeightStatus)inData.Data[1];
       }
 
-      // FIXME: dividing by 100 probably wont work with
-      // every scale, need to figure out what to do with
-      // Byte 3
-      weight = (Convert.ToDecimal(inData.Data[4]) +
-          Convert.ToDecimal(inData.Data[5]) * 256) / 100;
+      // Convert weight into pounds always
+      weight = (Convert.ToDecimal(inData.Data[4]) + 
+          Convert.ToDecimal(inData.Data[5]) * 256) *
+          Convert.ToDecimal(Math.Pow(10, (sbyte)inData.Data[3]));
 
       switch (Convert.ToInt16(inData.Data[2]))
       {
@@ -187,7 +186,7 @@ namespace ScaleInterface
           weight = weight * (decimal?)2.2;
           break;
         case 11: // Ounces
-          weight = weight * (decimal?)0.625;
+          weight = weight * (decimal?)0.0625;
           break;
         case 12: // Pounds
           // already in pounds, do nothing
