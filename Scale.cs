@@ -24,6 +24,12 @@ namespace ScaleInterface
 
   class USBScale
   {
+    private HidDevice scale;
+    private HidDeviceData inData;
+    private int scaleNum;
+    private int retryTime;
+    private int timeoutLength;
+
     public static string ErrorStringFor(ScaleWeightStatus s)
     {
       switch (s)
@@ -48,6 +54,7 @@ namespace ScaleInterface
           return string.Format("Unkown error #{0}", (int)s);
       }
     }
+
     public bool IsConnected
     {
       get
@@ -55,6 +62,7 @@ namespace ScaleInterface
         return scale == null ? false : scale.IsConnected;
       }
     }
+
     public decimal ScaleStatus
     {
       get
@@ -62,6 +70,7 @@ namespace ScaleInterface
         return inData.Data[1];
       }
     }
+
     public decimal ScaleWeightUnits
     {
       get
@@ -69,11 +78,6 @@ namespace ScaleInterface
         return inData.Data[2];
       }
     }
-    private HidDevice scale;
-    private HidDeviceData inData;
-    private int scaleNum;
-    private int retryTime;
-    private int timeoutLength;
 
     public USBScale(int scaleNum, int retryTime, int timeoutLength)
     {
@@ -131,12 +135,13 @@ namespace ScaleInterface
 
     public void Disconnect()
     {
-      if (scale.IsConnected)
+      if (this.IsConnected)
       {
         scale.CloseDevice();
         scale.Dispose();
       }
     }
+
     public void DebugScaleData()
     {
       for (int i = 0; i < inData.Data.Length; ++i)
@@ -144,20 +149,24 @@ namespace ScaleInterface
         Console.WriteLine("Byte {0}: {1}", i, inData.Data[i]);
       }
     }
+
     private long millisecondsSinceEpoch()
     {
       return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
+
     public ScaleWeightStatus GetWeight(out decimal? weight)
     {
       weight = null;
 
       // Byte 0 == Report ID?
-      // Byte 1 == Scale Status (1 == Fault, 2 == Stable @ 0, 3 == In Motion, 4 == Stable, 5 == Under 0, 6 == Over Weight, 7 == Requires Calibration, 8 == Requires Re-Zeroing)
+      // Byte 1 == Scale Status (1 == Fault, 2 == Stable @ 0, 3 == In Motion, 4 == Stable, 5 == Under 0,
+      //                         6 == Over Weight, 7 == Requires Calibration, 8 == Requires Re-Zeroing)
       // Byte 2 == Weight Unit
       // Byte 3 == Data Scaling (decimal placement) - signed byte is power of 10
       // Byte 4 == Weight LSB
       // Byte 5 == Weight MSB
+
       long startTime = millisecondsSinceEpoch();
       // The argument to scale.Read() is a timeout value for the USB
       // connection, not the actual Scale Status, so I'm leaving it at 250 as
