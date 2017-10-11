@@ -50,6 +50,7 @@ namespace ScaleReader
         else if (!(Int32.TryParse(arg, out scale) && i == args.Length - 1))
         {
           Error(string.Format("Invalid command-line argument. -- {0}", arg));
+          Environment.Exit(1);
         }
       }
       
